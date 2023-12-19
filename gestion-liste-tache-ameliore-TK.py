@@ -19,9 +19,24 @@ class Tache:
 class GestionnaireTaches:
     def __init__(self):
         self.taches = []
+        self.charger_taches()
 
     def ajouter_tache(self, tache):
         self.taches.append(tache)
+        self.sauvegarder_taches()
+
+    def charger_taches(self):
+        try:
+            with open("taches.json", "r") as f:
+                data = json.load(f)
+                self.taches = [Tache(tache["description"], datetime.strptime(tache["date_echeance"], '%Y-%m-%d') if tache["date_echeance"] else None) for tache in data]
+        except FileNotFoundError:
+            pass
+
+    def sauvegarder_taches(self):
+        with open("taches.json", "w") as f:
+            data = [{"description": tache.description, "date_echeance": tache.date_echeance.strftime('%Y-%m-%d') if tache.date_echeance else None} for tache in self.taches]
+            json.dump(data, f)
 
     def afficher_taches(self):
         return self.taches
