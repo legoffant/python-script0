@@ -16,6 +16,22 @@ class Tache:
         date_str = f" (échéance le {self.date_echeance.strftime('%Y-%m-%d')})" if self.date_echeance else ""
         return f"{self.description} ({statut}{date_str})"
 
+class GestionnaireTaches:
+    def __init__(self):
+        self.taches = []
+
+    def ajouter_tache(self, tache):
+        self.taches.append(tache)
+
+    def afficher_taches(self):
+        return self.taches
+
+    def afficher_taches_terminees(self):
+        return [tache for tache in self.taches if tache.terminee]
+
+    def trier_taches_par_date(self):
+        self.taches.sort(key=lambda tache: tache.date_echeance)
+
 class GestionnaireTachesApp:
     def __init__(self, master):
         self.master = master
@@ -45,7 +61,7 @@ class GestionnaireTachesApp:
 
     def afficher_taches(self):
         self.listbox_taches.delete(0, tk.END)
-        for tache in self.gestionnaire.taches:
+        for tache in self.gestionnaire.afficher_taches():
             self.listbox_taches.insert(tk.END, str(tache))
 
     def ajouter_tache(self):
@@ -60,11 +76,11 @@ class GestionnaireTachesApp:
         selection = self.listbox_taches.curselection()
         if selection:
             index = selection[0]
-            self.gestionnaire.taches[index].marquer_terminee()
+            self.gestionnaire.afficher_taches()[index].marquer_terminee()
             self.afficher_taches()
 
     def afficher_termines(self):
-        taches_terminees = [tache for tache in self.gestionnaire.taches if tache.terminee]
+        taches_terminees = self.gestionnaire.afficher_taches_terminees()
         if taches_terminees:
             messagebox.showinfo("Tâches Terminées", "\n".join(map(str, taches_terminees)))
         else:
